@@ -121,4 +121,7 @@ STATIC_URL = 'static/'
 
 # 
 OPENROUTER_API_KEY = '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'
-# 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
+
+
+import os
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

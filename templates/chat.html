@@ -208,7 +208,7 @@
 
     /* ── Input area ── */
     #input-area {
-      padding: 16px 24px 24px;
+      padding: 0px
       border-top: 1px solid rgba(255,255,255,.06);
       background: rgba(0,0,0,.2);
     }
@@ -276,7 +276,119 @@
       padding: 4px 6px; border-radius: 6px; transition: color .2s;
     }
     .logout-link:hover { color: #f87171; }
-  </style>
+    .settings-option, .user-badge {
+    user-select: none; /* Matnni tanlashni o'chiradi */
+    -webkit-user-select: none;
+}
+    .settings-option:hover {
+        background: rgba(255,255,255,0.08);
+    }
+    /* Light mode uchun mukammal ranglar */
+body.light-mode {
+    background: #f1f5f9 !important; /* Bir oz kulrangroq fon */
+    color: #1e293b !important;
+}
+
+body.light-mode #sidebar {
+    background: #ffffff !important;
+    border-right: 1px solid #e2e8f0;
+}
+
+/* AI xabari light mode'da */
+body.light-mode .msg-row.ai .msg-bubble {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #334155 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* User xabari light mode'da (ko'k rangni saqlab qoladi) */
+body.light-mode .msg-row.user .msg-bubble {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border: none;
+}
+
+/* Pastki yozuv yozish qismi */
+body.light-mode #input-area {
+    background: #f8fafc !important;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Sidebar umumiy strukturasi */
+#sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.sessions-list {
+    flex: 1; /* Suhbatlar ro'yxati o'rtani egallaydi */
+    overflow-y: auto;
+}
+
+/* Sidebar Footer - hamma narsani pastga tushiradi */
+.sidebar-footer {
+    margin-top: auto; /* Avtomatik ravishda eng pastga tushadi */
+    padding: 12px;
+    border-top: 1px solid rgba(255,255,255,.06);
+    position: relative;
+}
+
+/* Light mode rejimi uchun maxsus ranglar */
+body.light-mode {
+    background: #f8fafc !important;
+    color: #0f172a !important;
+}
+
+body.light-mode #sidebar {
+    background: #ffffff !important;
+    border-right: 1px solid #e2e8f0;
+}
+
+/* Light mode da AI va User xabarlari */
+body.light-mode .msg-row.ai .msg-bubble {
+    background: #f1f5f9 !important;
+    color: #1e293b !important;
+    border: 1px solid #e2e8f0;
+}
+
+body.light-mode .msg-row.user .msg-bubble {
+    background: #10b981 !important; /* Yashilroq yoki ko'kroq */
+    color: #ffffff !important;
+}
+
+/* Sozlamalar menyusi (Rasmda ko'rsatilganidek chap pastga) */
+#settingsMenu {
+    display: none;
+    position: absolute;
+    bottom: 75px; /* User badge dan biroz tepada */
+    left: 12px;
+    width: 230px;
+    background: #13131f;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
+body.light-mode #settingsMenu {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+}
+
+body.light-mode .settings-option {
+    color: #1e293b !important;
+}
+
+/* Belgilanib qolmaslik uchun (Selection error fix) */
+.user-badge, .settings-option {
+    user-select: none;
+    -webkit-user-select: none;
+}
+</style>
 </head>
 <body>
 
@@ -323,21 +435,40 @@
     {% endfor %}
   </div>
 
-  <div class="sidebar-footer">
-    <div class="user-badge">
-      <div class="avatar">{{ request.user.username|first|upper }}</div>
-      <div style="flex:1;min-width:0;">
-        <p style="font-size:13px;font-weight:500;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ request.user.username }}</p>
-        <p style="font-size:11px;color:#475569;">Foydalanuvchi</p>
-      </div>
-      <a href="{% url 'logout' %}" class="logout-link" title="Chiqish">
-        <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
-          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </a>
-    </div>
-  </div>
 </div>
+
+<div class="sidebar-footer">
+    <div id="settingsMenu">
+        <div class="settings-option" onclick="toggleDarkMode()">
+            <span id="theme-icon">🌙</span> <span id="theme-text">Qora fon</span>
+        </div>
+        <div class="settings-option" onclick="changeTheme()">
+            <span>🌈</span> Ranglar
+        </div>
+        <div class="settings-option" onclick="resetTheme()">
+            <span>🔄</span> Reset
+        </div>
+        <div style="height:1px; background:rgba(255,255,255,0.1); margin:4px 0;"></div>
+        <a href="{% url 'logout' %}" style="text-decoration:none; color:#f87171;">
+            <div class="settings-option">
+                <span>🚪</span> Chiqish
+            </div>
+        </a>
+    </div>
+
+    <div class="user-badge" onclick="toggleSettingsMenu()" style="display:flex; align-items:center; gap:12px; padding:10px; border-radius:12px; background:rgba(255,255,255,0.03); cursor:pointer; user-select:none;">
+        <div class="avatar" style="width:35px; height:35px; border-radius:10px; background:linear-gradient(45deg, #6366f1, #a855f7); display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">
+            {{ request.user.username|first|upper }}
+        </div>
+        <div style="flex:1; overflow:hidden;">
+            <div style="font-size:14px; font-weight:500; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">
+                {{ request.user.username }}
+            </div>
+            <div style="font-size:11px; opacity:0.5;">Sozlamalar</div>
+        </div>
+        <div style="opacity:0.3; font-size:10px;">▲</div>
+    </div>
+</div>  
 
 <div id="main">
 
@@ -535,6 +666,90 @@
   if (window.innerWidth <= 640) {
     document.getElementById('topbar').style.display = 'flex';
   }
+  // 1. Menyuni ochish va yopish
+// Menyuni ochish
+function toggleSettingsMenu() {
+    const menu = document.getElementById('settingsMenu');
+    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+}
+
+// Oq va Qora fon logikasi
+let isLightMode = localStorage.getItem('isLightMode') === 'true';
+
+function applyTheme() {
+    if (isLightMode) {
+        document.body.classList.add('light-mode');
+        document.getElementById('theme-icon').innerText = "🌙";
+        document.getElementById('theme-text').innerText = "Qora fon";
+    } else {
+        document.body.classList.remove('light-mode');
+        document.getElementById('theme-icon').innerText = "☀️";
+        document.getElementById('theme-text').innerText = "Oq fon";
+    }
+}
+applyTheme(); // Sahifa yuklanganda ishga tushadi
+
+function toggleDarkMode() {
+    isLightMode = !isLightMode;
+    localStorage.setItem('isLightMode', isLightMode);
+    
+    const icon = document.getElementById('theme-icon');
+    const text = document.getElementById('theme-text');
+
+    if (isLightMode) {
+        document.body.classList.add('light-mode');
+        icon.innerText = "🌙";
+        text.innerText = "Qora fon";
+    } else {
+        document.body.classList.remove('light-mode');
+        icon.innerText = "☀️";
+        text.innerText = "Oq fon";
+    }
+}
+
+// Rang effektini o'zgartirish
+let currentHue = localStorage.getItem('themeHue') || 0;
+document.body.style.filter = `hue-rotate(${currentHue}deg)`;
+
+function changeTheme() {
+    currentHue = (parseInt(currentHue) + 60) % 360;
+    document.body.style.filter = `hue-rotate(${currentHue}deg)`;
+    localStorage.setItem('themeHue', currentHue);
+}
+
+function resetTheme() {
+    localStorage.clear();
+    location.reload();
+}
+
+// Menyudan tashqariga bosilganda yopish
+window.onclick = function(event) {
+    const menu = document.getElementById('settingsMenu');
+    if (!event.target.closest('.sidebar-footer')) {
+        menu.style.display = 'none';
+    }
+}
+function updateBtnText(light) {
+    const icon = document.getElementById('theme-icon');
+    const text = document.getElementById('theme-text');
+    if (icon) icon.innerText = light ? "🌙" : "☀️";
+    if (text) text.innerText = light ? "Qora fon" : "Oq fon";
+}
+
+function resetTheme() {
+    localStorage.clear();
+    location.reload();
+}
+
+// Tashqariga bosilganda yopish
+window.addEventListener('click', function(e) {
+    const menu = document.getElementById('settingsMenu');
+    const badge = document.querySelector('.user-badge');
+    if (menu && !menu.contains(e.target) && !badge.contains(e.target)) {
+        menu.style.display = 'none';
+    }
+});
+
 </script>
 </body>
 </html>
